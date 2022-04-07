@@ -3,16 +3,82 @@
 SELECT first_name, last_name, salary, job_title
 FROM employees
          LEFT JOIN jobs USING (job_id);
+
+select first_name,last_name,salary,job_title
+        from employees
+            join jobs using (job_id);
+
+select first_name,last_name,salary,j.job_title
+        from employees e
+            join jobs j on (j.job_id=e.job_id);
 -- 2. the first and last name, department, city, and state province for each employee.
+select first_name,last_name,department_name,city,state_province
+        from employees
+            left join departments using (department_id)
+            left join locations using(location_id);
+
+select first_name,last_name,department_name,city,state_province
+        from employees e
+         left join departments d ON (d.department_id=e.department_id)
+         left join locations l ON(l.location_id=d.location_id);
+
 -- 3. the first name, last name, department number and department name, for all employees for departments 80 or 40.
--- 4. those employees who contain a letter z to their first name and also display their last name, department, city, and state province.
+select first_name,last_name,d.department_name,d.department_id
+        from employees e
+        left join departments d
+            ON (d.department_id=e.department_id) where d.department_id = 80 or d.department_id=40;
+
+select first_name,last_name,d.department_name,d.department_id
+        from employees e
+        left join departments d
+            ON (d.department_id=e.department_id) where d.department_id in(80,40);
+
+-- 4. those employees who contain a letter z  to their first name and also display their last name, department, city, and state province.
+select  last_name,department_name,city,state_province
+from employees e
+         left join departments d ON (d.department_id=e.department_id)
+         left join locations l ON(l.location_id=d.location_id) where e.first_name like '%z%';
+
+select  last_name,department_name,city,state_province
+        from employees e
+         left join departments d ON (d.department_id=e.department_id)
+         left join locations l ON(l.location_id=d.location_id) where instr(e.first_name,'z')>0;
+
 -- 5. the first and last name and salary for those employees who earn less than the employee earn whose number is 182.
+select first_name,last_name,salary
+        from employees
+        where salary <
+              (select salary from employees where employee_id = 182);
+
 -- 6. the first name of all employees including the first name of their manager.
+select e.first_name,d.first_name
+        from employees e
+        join employees d on(e.manager_id=d.employee_id);
+
 -- 7. the first name of all employees and the first name of their manager including those who does not working under any manager.
+select e.first_name,d.first_name
+    from employees e
+         left join employees d on(e.manager_id=d.employee_id);
+
 -- 8. the details of employees who manage a department.
+select * from employees
+    where employee_id in
+      (select manager_id from employees);
+
 -- 9. the first name, last name, and department number for those employees who works in the same department as the employee who holds the last name as Taylor.
+select first_name, last_name,department_id
+    from employees
+        where department_id
+          in(select department_id from employees where last_name = 'Taylor');
+
 --10. the department name and number of employees in each of the department.
+select department_name,count(*)
+    from departments
+        right join employees
+            using(department_id) GROUP BY department_name;
+
 --11. the name of the department, average salary and number of employees working in that department who got commission.
+
 --12. job title and average salary of employees.
 --13. the country name, city, and number of those departments where at least 2 employees are working.
 --14. the employee ID, job name, number of days worked in for all those jobs in department 80.
